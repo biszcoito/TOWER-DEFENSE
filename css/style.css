@@ -1,0 +1,29 @@
+body, html {
+    margin: 0; padding: 0; overflow: hidden;
+    background-color: #1a1a2e;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: #e0e0e0; user-select: none;
+}
+#game-container { display: flex; width: 100vw; height: 100vh; }
+#gameCanvas { background-color: #0f0f1b; cursor: pointer; }
+#ui-panel {
+    width: 280px; background-color: #16213e; padding: 20px;
+    box-sizing: border-box; display: flex; flex-direction: column;
+    gap: 20px; overflow-y: auto; border-left: 3px solid #0f3460;
+}
+.ui-box { background-color: rgba(31, 64, 104, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #1f4068;}
+h2 { color: #e94560; margin-top: 0; border-bottom: 2px solid #e94560; padding-bottom: 5px; margin-bottom: 10px; }
+p { font-size: 1.1em; margin: 8px 0; }
+span { color: #f6e58d; font-weight: bold; }
+button {
+    background-color: #1f4068; color: #fff; border: none; padding: 12px 15px; width: 100%;
+    border-radius: 5px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s, transform 0.1s;
+}
+button:hover { background-color: #3f6c9b; }
+button:active { transform: scale(0.98); }
+button.build-button.selected { background-color: #ff9f1c; box-shadow: 0 0 10px #ff9f1c; }
+#start-wave-btn { background-color: #55E6C1; color: #1a1a2e; margin-top: auto; }
+#start-wave-btn:disabled { background-color: #666; cursor: not-allowed; }
+#upgrade-panel button { margin-top: 10px; }
+#sell-btn { background-color: #e43f5a; }
+#upgrade-panel { transition: all 0.3s; }
