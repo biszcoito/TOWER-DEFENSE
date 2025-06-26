@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Tower Defense</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="ui-panel">
+            <!-- Informações do Jogo -->
+            <div class="ui-box">
+                <h2>Status</h2>
+                <p>❤️ Vidas: <span id="lives">20</span></p>
+                <p>💰 Dinheiro: <span id="money">500</span></p>
+                <p>🌊 Onda: <span id="wave">0</span></p>
+            </div>
+            
+            <!-- Painel de Construção -->
+            <div class="ui-box" id="build-panel">
+                <h2>Construir</h2>
+            </div>
+            
+            <!-- Painel de Upgrade -->
+            <div class="ui-box" id="upgrade-panel" style="display: none;">
+                <h2 id="upgrade-title"></h2>
+                <p id="upgrade-stats"></p>
+                <button id="upgrade-btn">Melhorar</button>
+                <button id="sell-btn">Vender</button>
+            </div>
+
+            <!-- Botão de Ação -->
+            <button id="start-wave-btn">Iniciar Onda</button>
+
+            <!-- Botão de Ranking -->
+            <button id="show-ranking-btn">Ver Ranking</button>
+        </div>
+
+        <!-- MODAL DE FIM DE JOGO -->
+        <div id="score-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>Fim de Jogo!</h2>
+                <p>Sua pontuação final foi: <span id="final-score">0</span></p>
+                <input type="text" id="player-name-input" placeholder="Digite seu nome" maxlength="10">
+                <button id="submit-score-btn">Enviar Pontuação</button>
+            </div>
+        </div>
+
+        <!-- MODAL DE RANKING -->
+        <div id="ranking-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>Ranking Global</h2>
+                <ol id="ranking-list"></ol>
+                <button id="close-ranking-btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS EXTERNOS E DE INICIALIZAÇÃO -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/firebase-init.js"></script>
+
+    <!-- SCRIPTS DO JOGO -->
+    <script src="js/tower.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/projectile.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
