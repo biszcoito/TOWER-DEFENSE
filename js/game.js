@@ -11,7 +11,7 @@ class Game {
 
         // Estado do Jogo
         this.lives = 20;
-        this.money = 250;
+        this.money = 25000;
         this.wave = 0;
         this.enemies = [];
         this.towers = [];
