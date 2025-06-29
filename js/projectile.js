@@ -90,3 +90,33 @@ class Projectile {
         }
     }
 }
+// ABRIR O ARQUIVO: projectile.js
+// ... (após a classe Projectile) ...
+
+class MoneyParticle extends Particle {
+    constructor(game, x, y, text) {
+        // Chama o construtor da Particle, mas com alguns valores fixos.
+        // O raio e a cor não serão usados, pois vamos desenhar texto.
+        super(game, x, y, 0, '', 1000); 
+        this.text = text;
+        this.initialY = y;
+    }
+
+    update(deltaTime) {
+        // A partícula sobe lentamente
+        this.y -= 0.5;
+        // Chama o update da classe pai para controlar a duração e remoção
+        return super.update(deltaTime); 
+    }
+
+    draw(ctx) {
+        // Usa a opacidade da classe pai para o efeito de fade out
+        ctx.save();
+        ctx.globalAlpha = this.duration / this.initialDuration;
+        ctx.fillStyle = '#fca311'; // Dourado
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.restore();
+    }
+}

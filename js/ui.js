@@ -1,12 +1,23 @@
-// ui.js
+// ui.js (Versão Corrigida)
 class UI {
     constructor(game){
-        this.game=game; this.selectedTower=null;
+        this.game=game; 
+        this.selectedTower=null;
         
+        // ★ MUDANÇA: Mapeamos mais elementos internos do painel de upgrade
         this.elements = {
-            lives: document.getElementById('lives'), money: document.getElementById('money'),
-            wave: document.getElementById('wave'), buildPanel:document.getElementById('build-panel'),
-            upgradePanel: document.getElementById('upgrade-panel'), startBtn: document.getElementById('start-wave-btn'),
+            lives: document.getElementById('lives'), 
+            money: document.getElementById('money'),
+            wave: document.getElementById('wave'), 
+            score: document.getElementById('score'),
+            buildPanel: document.getElementById('build-panel'),
+            upgradePanel: document.getElementById('upgrade-panel'),
+            upgradeTitle: document.getElementById('upgrade-title'),
+            upgradeStats: document.getElementById('upgrade-stats'),
+            upgradeButtons: document.getElementById('upgrade-buttons'),
+            upgradeBtn: document.getElementById('upgrade-btn'),
+            sellBtn: document.getElementById('sell-btn'),
+            startBtn: document.getElementById('start-wave-btn'),
             scoreModal: document.getElementById('score-modal'),
             finalScore: document.getElementById('final-score'),
             playerNameInput: document.getElementById('player-name-input'),
@@ -22,11 +33,30 @@ class UI {
         this.elements.showRankingBtn.onclick = () => this.fetchAndDisplayRanking();
         this.elements.closeRankingBtn.onclick = () => this.elements.rankingModal.style.display = 'none';
 
+        // ★ MUDANÇA: Adicionamos os eventos aos botões UMA VEZ, no início.
+        this.elements.upgradeBtn.onclick = () => this.handleUpgradeClick();
+        this.elements.sellBtn.onclick = () => this.handleSellClick();
+
         this.createBuildButtons();
         this.update();
     }
     
-    // Função para criar os botões de construção das torres
+    // ★ MUDANÇA: Nova função para lidar com o clique de upgrade
+    handleUpgradeClick() {
+        if (this.selectedTower) {
+            this.selectedTower.upgrade();
+        }
+    }
+
+    // ★ MUDANÇA: Nova função para lidar com o clique de venda
+    handleSellClick() {
+        if (this.selectedTower) {
+            const t = this.selectedTower;
+            this.game.particles.push(new Particle(this.game, t.x, t.y, 25, 'rgba(255, 223, 0, 0.8)', 500, true));
+            this.game.sellTower(t);
+        }
+    }
+
     createBuildButtons() {
         this.elements.buildPanel.innerHTML = `<h2>Construir</h2>`;
         for(const type in TOWER_DATA){
@@ -41,47 +71,71 @@ class UI {
             this.elements.buildPanel.appendChild(btn);
         }
     }
-
-    // Função que atualiza toda a informação da interface
+    
+    // ★ MUDANÇA: A lógica de 'update' foi completamente reescrita
     update() {
-        // Status do jogo
+        // Status do jogo (sempre atualiza)
         this.elements.lives.textContent = this.game.lives;
         this.elements.money.textContent = this.game.money;
         this.elements.wave.textContent = this.game.wave;
+        this.elements.score.textContent = this.game.score;
         
-        // Destaque do botão de construção
         this.elements.buildPanel.querySelectorAll('.build-button').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.type === this.game.selectedTowerToBuild);
         });
         
         // Painel de Upgrade
-        if(this.selectedTower) {
+        if (this.selectedTower) {
             const t = this.selectedTower;
-            const nextLevel = TOWER_DATA[t.type].levels[t.level];
-            let upgradeDesc = nextLevel ? `Melhorar p/ Lvl ${t.level+1} ($${nextLevel.cost})` : "Nível Máximo";
+            const towerStaticData = TOWER_DATA[t.type];
+            const currentLevelData = towerStaticData.levels[t.level - 1];
+            const nextLevelData = towerStaticData.levels[t.level];
             const sellPrice = this.game.getSellValue(t);
 
-            this.elements.upgradePanel.style.display = 'block';
-            this.elements.upgradePanel.innerHTML = `
-                <h2>${t.name} (Lvl ${t.level})</h2>
-                <p>Dano: ${t.damage || 'N/A'}</p>
-                <p>Alcance: ${t.range || 'N/A'}</p>
-                <p>Cadência: ${t.fireRate || 'N/A'}</p>
-                <button id="upgrade-btn" ${!nextLevel || this.game.money < nextLevel.cost ? 'disabled' : ''}>${upgradeDesc}</button>
-                <button id="sell-btn">Vender por $${sellPrice}</button>
+            // Apenas atualiza o conteúdo, não recria o HTML
+            this.elements.upgradeTitle.textContent = `${t.name} (Nível ${t.level})`;
+            
+            let statsHTML = `
+                <div class="stats-comparison">
+                    <div class="stat"><span>Dano:</span> ${currentLevelData.damage || 'N/A'}</div>
+                    ${nextLevelData ? `<div class="stat-next">→ ${nextLevelData.damage || 'N/A'}</div>` : ''}
+                </div>
+                <div class="stats-comparison">
+                    <div class="stat"><span>Alcance:</span> ${currentLevelData.range || 'N/A'}</div>
+                    ${nextLevelData ? `<div class="stat-next">→ ${nextLevelData.range || 'N/A'}</div>` : ''}
+                </div>
+                 <div class="stats-comparison">
+                    <div class="stat"><span>Cadência:</span> ${(60 / (currentLevelData.fireRate || 60)).toFixed(1)}/s</div>
+                    ${nextLevelData ? `<div class="stat-next">→ ${(60 / (nextLevelData.fireRate || 60)).toFixed(1)}/s</div>` : ''}
+                </div>
             `;
-            if(nextLevel) document.getElementById('upgrade-btn').onclick = () => t.upgrade();
-            document.getElementById('sell-btn').onclick = () => this.game.sellTower(t);
+            this.elements.upgradeStats.innerHTML = statsHTML;
+            
+            if (nextLevelData) {
+                const canAfford = this.game.money >= nextLevelData.cost;
+                this.elements.upgradeBtn.style.display = 'block';
+                this.elements.upgradeBtn.disabled = !canAfford;
+                this.elements.upgradeBtn.innerHTML = `
+                    Melhorar ($${nextLevelData.cost})
+                    ${nextLevelData.description ? `<br><small>"${nextLevelData.description}"</small>` : ''}
+                `;
+            } else {
+                this.elements.upgradeBtn.style.display = 'block';
+                this.elements.upgradeBtn.disabled = true;
+                this.elements.upgradeBtn.innerHTML = `Nível Máximo Atingido!`;
+            }
+
+            this.elements.sellBtn.textContent = `Vender por $${sellPrice}`;
+            this.elements.upgradePanel.style.display = 'block';
         } else {
             this.elements.upgradePanel.style.display = 'none';
         }
     }
-
+    
     // Função que desenha elementos da UI sobre o canvas
     draw() {
         this.update(); // Atualiza os textos da UI a cada frame
         
-        // Desenha o preview da torre no cursor
         if(this.game.selectedTowerToBuild){
             const data = TOWER_DATA[this.game.selectedTowerToBuild];
             const {x,y} = this.game.mousePos;
@@ -93,7 +147,6 @@ class UI {
             ctx.globalAlpha = 1.0;
         }
         
-        // Desenha o alcance da torre selecionada para upgrade
         if(this.selectedTower){
              const {x,y,range} = this.selectedTower;
              const ctx = this.game.ctx;
@@ -101,60 +154,47 @@ class UI {
              ctx.beginPath(); ctx.arc(x,y,range,0,Math.PI*2); ctx.stroke();
         }
     }
-
-    // Função para mostrar o modal de pontuação
+    
     showScoreModal(score) {
         this.elements.finalScore.textContent = score;
         this.elements.scoreModal.style.display = 'flex';
     }
 
-    // Função para enviar a pontuação para o Firebase
     submitScore() {
         const playerName = this.elements.playerNameInput.value.trim();
-        const score = parseInt(this.elements.finalScore.textContent, 10);
+        const score = this.game.score; 
 
         if(!playerName) {
-            alert('Por favor, digite um nome!');
-            return;
+            alert('Por favor, digite um nome!'); return;
         }
-
+        if (isNaN(score)) {
+            console.error("Tentativa de enviar score inválido:", score);
+            alert("Ocorreu um erro ao calcular a pontuação. Não foi possível enviar."); return;
+        }
         this.elements.submitScoreBtn.disabled = true;
         this.elements.submitScoreBtn.textContent = 'Enviando...';
 
         db.collection("highscores").add({
-            name: playerName,
-            score: score,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-            console.log("Pontuação salva com sucesso!");
+            name: playerName, score: score, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
             this.elements.scoreModal.style.display = 'none';
             this.fetchAndDisplayRanking();
-        })
-        .catch((error) => {
+        }).catch((error) => {
             console.error("Erro ao salvar pontuação: ", error);
             this.elements.submitScoreBtn.disabled = false;
             this.elements.submitScoreBtn.textContent = 'Enviar Pontuação';
         });
     }
     
-    // Função para buscar e exibir o ranking do Firebase
     async fetchAndDisplayRanking() {
         this.elements.rankingList.innerHTML = '<li>Carregando...</li>';
         this.elements.rankingModal.style.display = 'flex';
-
         try {
-            const querySnapshot = await db.collection("highscores")
-                                         .orderBy("score", "desc")
-                                         .limit(10)
-                                         .get();
-            
+            const querySnapshot = await db.collection("highscores").orderBy("score", "desc").limit(10).get();
             this.elements.rankingList.innerHTML = '';
             if(querySnapshot.empty) {
-                this.elements.rankingList.innerHTML = '<li>Ainda não há pontuações!</li>';
-                return;
+                this.elements.rankingList.innerHTML = '<li>Ainda não há pontuações!</li>'; return;
             }
-
             querySnapshot.forEach((doc, index) => {
                 const data = doc.data();
                 const li = document.createElement('li');
@@ -166,7 +206,6 @@ class UI {
             this.elements.rankingList.innerHTML = '<li>Erro ao carregar o ranking.</li>';
         }
     }
-
     enableStartWaveButton(){ 
         if(this.elements.startBtn) this.elements.startBtn.disabled = false; 
     }
