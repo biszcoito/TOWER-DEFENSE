@@ -13,9 +13,9 @@ const TOWER_DATA = {
         {range: 145, slow: 0.4, cost:150},
         {range: 160, slow: 0.5, cost:225, description:"Chance de Congelar"}]},
     drone_carrier: { name: 'Porta-Drone', cost: 400, color: '#ccc', projectile: { type:'bullet', color:'#f6e58d', size:3}, levels:[
-        {cost:0, drones:1, orbitRadius: 80, droneDamage: 15, droneFireRate: 15, droneRange: 180},
-        {cost:300, drones:1, orbitRadius: 80, droneDamage: 22, droneFireRate: 12, droneRange: 200},
-        {cost:550, drones:3, orbitRadius: 90, droneDamage: 25, droneFireRate: 10, droneRange: 220, miniOrbitRadius: 50, description: "Asa-Mãe"}]},
+        {cost:0, drones:1, orbitRadius: 80, droneDamage: 25, droneFireRate: 15, droneRange: 180},
+        {cost:300, drones:1, orbitRadius: 80, droneDamage: 40, droneFireRate: 12, droneRange: 200},
+        {cost:550, drones:3, orbitRadius: 90, droneDamage: 45, droneFireRate: 10, droneRange: 220, miniOrbitRadius: 50, description: "Asa-Mãe"}]},
     interest_bank: { name: 'Banco de Juros', cost: 400, color: '#fca311', levels:[
         {cost:0,    income: 2,  range: 0, description: "Gera $2 por segundo."},
         {cost:350,  income: 5,  range: 0, description: "Gera $5 por segundo."},
